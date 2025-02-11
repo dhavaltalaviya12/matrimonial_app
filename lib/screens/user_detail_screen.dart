@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-
-import '../utils/app_colors.dart';
 import '../utils/string_const.dart';
 import '../utils/user_model.dart';
 import 'add_edit_user_screen.dart';
 
 class UserDetailScreen extends StatefulWidget {
-  int id;
+  final int id;
   UserDetailScreen({super.key, required this.id});
 
   @override
@@ -24,17 +22,15 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
             const Icon(
               Icons.person,
               size: 25,
-              weight: 400,
               color: Colors.white,
             ),
-            const SizedBox(
-              width: 10,
-            ),
+            const SizedBox(width: 10),
             const Expanded(
               child: Text(
                 'User Details',
                 style: TextStyle(
-                  fontSize: 25,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
@@ -42,108 +38,88 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
           ],
         ),
         backgroundColor: Colors.blue,
+        elevation: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(7),
+        padding: const EdgeInsets.all(16),
         child: Padding(
-          padding: const EdgeInsets.all(7),
+          padding: const EdgeInsets.all(10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Card(
-                elevation: 7,
+                elevation: 5,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(7),
+                  padding: const EdgeInsets.all(15),
                   child: Column(
                     children: [
                       CircleAvatar(
-                        radius: 50,
+                        radius: 60,
                         backgroundColor: user[GENDER] == 'male'
-                            ? AppColors.secondary
-                            : AppColors.primary,
+                            ? Colors.blueAccent
+                            : Colors.pinkAccent,
                         child: Icon(
                           user[GENDER] == 'male' ? Icons.male : Icons.female,
-                          size: 50,
+                          size: 60,
                           color: Colors.white,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 15),
                       Text(
                         user[NAME],
                         style: const TextStyle(
                           fontSize: 25,
+                          overflow: TextOverflow.ellipsis,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 15),
                       rowOfCard(
                         icon: Icons.person,
                         iconColor: Colors.blue,
                         field: NAME,
                         data: user[NAME],
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      const SizedBox(height: 12),
                       rowOfCard(
                         icon: Icons.location_city,
                         iconColor: Colors.orangeAccent,
                         field: CITY,
                         data: user[CITY],
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      const SizedBox(height: 12),
                       rowOfCard(
                         icon: Icons.mail,
                         iconColor: Colors.red,
                         field: EMAIL,
                         data: user[EMAIL],
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      const SizedBox(height: 12),
                       rowOfCard(
                         icon: Icons.phone_android,
                         iconColor: Colors.black,
                         field: MOBILE,
                         data: user[MOBILE],
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      const SizedBox(height: 12),
                       rowOfCard(
-                        icon:
-                        user[GENDER] == 'male' ? Icons.male : Icons.female,
-                        iconColor: Colors.red,
+                        icon: user[GENDER] == 'male' ? Icons.male : Icons.female,
+                        iconColor: user[GENDER] == 'male' ? Colors.blue : Colors.pink,
                         field: GENDER,
                         data: user[GENDER],
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      rowOfCard(
-                        icon: Icons.calendar_month_outlined,
-                        iconColor: Colors.green,
-                        field: DOB,
-                        data: user[DOB],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      const SizedBox(height: 12),
                       rowOfCard(
                         icon: Icons.emoji_emotions_rounded,
-                        iconColor: Colors.blue,
+                        iconColor: Colors.green,
                         field: AGE,
                         data: user[AGE],
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      const SizedBox(height: 15),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -152,42 +128,37 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                             size: 25,
                             color: Colors.brown,
                           ),
-                          const SizedBox(
-                            width: 10,
-                          ),
+                          const SizedBox(width: 10),
                           const Text(
                             'Hobbies: ',
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.black,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                          const SizedBox(
-                            width: 1,
-                          ),
-                          getHobbies(hobbies: user[HOBBIES]),
+                          const SizedBox(width: 5),
+                          getHobbies(hobbies: user[HOBBIES],),
                         ],
-                      )
+                      ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.secondary,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 30, vertical: 10),
+                      backgroundColor: Colors.blueAccent,
+                      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
                     ),
                     onPressed: () async {
                       await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              AddEditUserScreen(id: widget.id),
+                          builder: (context) => AddEditUserScreen(id: widget.id),
                         ),
                       );
                       setState(() {});
@@ -195,14 +166,13 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                     icon: const Icon(Icons.edit, color: Colors.white),
                     label: const Text(
                       'Edit',
-                      style: TextStyle(color: Colors.white, fontSize: 15),
+                      style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   ),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 30, vertical: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
                     ),
                     onPressed: () {
                       showDeleteConfirmationDialog(context, widget.id);
@@ -210,7 +180,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                     icon: const Icon(Icons.delete, color: Colors.white),
                     label: const Text(
                       'Delete',
-                      style: TextStyle(color: Colors.white, fontSize: 15),
+                      style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   ),
                 ],
@@ -222,24 +192,27 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
     );
   }
 
-  Widget rowOfCard(
-      {required IconData icon,
-        required Color iconColor,
-        required field,
-        required data}) {
+  Widget rowOfCard({
+    required IconData icon,
+    required Color iconColor,
+    required field,
+    required data,
+  }) {
     return Row(
       children: [
         Icon(
           icon,
-          size: 25,
+          size: 30,
           color: iconColor,
         ),
         const SizedBox(width: 10),
         Text(
           field + ': ',
+          overflow: TextOverflow.ellipsis,
           style: const TextStyle(
             fontSize: 16,
             color: Colors.black,
+            fontWeight: FontWeight.w600, // Added boldness for emphasis
           ),
         ),
         const SizedBox(width: 10),
@@ -257,7 +230,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
     );
   }
 
-  void showDeleteConfirmationDialog(BuildContext context, int index) {
+  void showDeleteConfirmationDialog(BuildContext context, int idx) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -272,15 +245,11 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
               },
             ),
             TextButton(
-              child: const Text(
-                'Delete',
-                style: TextStyle(color: Colors.red),
-              ),
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
               onPressed: () {
                 setState(() {
-                  UserModel.userList.removeAt(index);
+                  UserModel.userList.removeAt(idx); // Delete user
                 });
-                Navigator.of(context).pop();
                 Navigator.of(context).pop();
               },
             ),

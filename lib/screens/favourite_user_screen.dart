@@ -21,17 +21,15 @@ class _FavoriteUserScreenState extends State<FavouriteUserScreen> {
             const Icon(
               Icons.favorite,
               size: 25,
-              weight: 400,
               color: Colors.pink,
             ),
-            const SizedBox(
-              width: 10,
-            ),
+            const SizedBox(width: 10),
             const Expanded(
               child: Text(
-                'Favorite',
+                'Favourite Users',
                 style: TextStyle(
-                  fontSize: 25,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
@@ -39,6 +37,7 @@ class _FavoriteUserScreenState extends State<FavouriteUserScreen> {
           ],
         ),
         backgroundColor: Colors.blue,
+        elevation: 0,
       ),
       body: getFavoriteListView(),
     );
@@ -56,9 +55,7 @@ class _FavoriteUserScreenState extends State<FavouriteUserScreen> {
               await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => UserDetailScreen(
-                    id: idx,
-                  ),
+                  builder: (context) => UserDetailScreen(id: idx),
                 ),
               );
               setState(() {});
@@ -66,22 +63,20 @@ class _FavoriteUserScreenState extends State<FavouriteUserScreen> {
             child: getCardView(user: user, idx: idx),
           );
         }
-        return const SizedBox(
-          height: 0,
-        );
+        return const SizedBox.shrink(); // Returns empty widget if not a favorite user
       },
     );
   }
 
   Widget getCardView({required user, required idx}) {
     return Card(
-      margin: const EdgeInsets.all(10),
+      margin: const EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
+        borderRadius: BorderRadius.circular(12.0),
       ),
-      elevation: 7,
+      elevation: 5,
       child: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(15),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -95,45 +90,35 @@ class _FavoriteUserScreenState extends State<FavouriteUserScreen> {
                     field: NAME,
                     data: user[NAME],
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  const SizedBox(height: 10),
                   rowOfCard(
                     icon: Icons.location_city,
                     iconColor: Colors.orangeAccent,
                     field: CITY,
                     data: user[CITY],
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  const SizedBox(height: 10),
                   rowOfCard(
                     icon: Icons.mail,
-                    iconColor: Colors.red,
+                    iconColor: Colors.green,
                     field: EMAIL,
                     data: user[EMAIL],
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  const SizedBox(height: 10),
                   rowOfCard(
                     icon: Icons.phone_android,
                     iconColor: Colors.black,
                     field: MOBILE,
                     data: user[MOBILE],
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  const SizedBox(height: 10),
                   rowOfCard(
                     icon: user[GENDER] == 'male' ? Icons.male : Icons.female,
                     iconColor: user[GENDER] == 'male' ? Colors.blue : Colors.pink,
                     field: GENDER,
                     data: user[GENDER],
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  const SizedBox(height: 10),
                   rowOfCard(
                     icon: Icons.emoji_emotions_rounded,
                     iconColor: Colors.green,
@@ -147,9 +132,8 @@ class _FavoriteUserScreenState extends State<FavouriteUserScreen> {
               children: [
                 IconButton(
                   onPressed: () {
-                    setState(() {
-                      user[ISFAVORITE] = !user[ISFAVORITE];
-                    });
+                    user[ISFAVORITE] = !user[ISFAVORITE];
+                    setState(() {});
                   },
                   icon: Icon(
                     user[ISFAVORITE] ? Icons.favorite : Icons.favorite_border,
@@ -157,9 +141,6 @@ class _FavoriteUserScreenState extends State<FavouriteUserScreen> {
                     size: 30,
                   ),
                 ),
-                // const SizedBox(
-                //   height: 10,
-                // ),
                 IconButton(
                   onPressed: () async {
                     await Navigator.push(
@@ -176,9 +157,6 @@ class _FavoriteUserScreenState extends State<FavouriteUserScreen> {
                     size: 30,
                   ),
                 ),
-                // const SizedBox(
-                //   height: 10,
-                // ),
                 IconButton(
                   onPressed: () {
                     showDeleteConfirmationDialog(context, idx);
@@ -197,11 +175,12 @@ class _FavoriteUserScreenState extends State<FavouriteUserScreen> {
     );
   }
 
-  Widget rowOfCard(
-      {required IconData icon,
-        required Color iconColor,
-        required field,
-        required data}) {
+  Widget rowOfCard({
+    required IconData icon,
+    required Color iconColor,
+    required field,
+    required data,
+  }) {
     return Row(
       children: [
         Icon(
@@ -212,17 +191,22 @@ class _FavoriteUserScreenState extends State<FavouriteUserScreen> {
         const SizedBox(width: 10),
         Text(
           field + ': ',
+          overflow: TextOverflow.ellipsis,
           style: const TextStyle(
             fontSize: 16,
             color: Colors.black,
+            fontWeight: FontWeight.w600, // Added boldness for emphasis
           ),
         ),
         const SizedBox(width: 10),
-        Text(
-          data ?? 'null',
-          style: const TextStyle(
-            fontSize: 16,
-            color: Colors.black,
+        Expanded(
+          child: Text(
+            data ?? 'null',
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.black,
+            ),
           ),
         ),
       ],

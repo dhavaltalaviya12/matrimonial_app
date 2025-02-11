@@ -3,28 +3,11 @@ import './string_const.dart';
 class UserModel {
   static List<Map<String, dynamic>> userList = [
     {
-      NAME: 'Prof. Mehul Bhundiya',
-      EMAIL: 'mehul@du.ac.in',
-      PASSWORD: 'Mehul@123',
-      MOBILE: '9428231065',
-      DOB: '1-12-2000',
-      AGE: '25',
-      CITY: 'Rajkot',
-      GENDER: 'male',
-      HOBBIES: [
-        ['Reading 📖', true],
-        ['Traveling 🚞', true],
-        ['Dancing 🕺', true],
-        ['Cooking 🧑‍🍳', true],
-      ],
-      ISFAVORITE: true,
-    },
-    {
       NAME: 'Dhaval',
       EMAIL: 'dhaval123@gmail.com',
       PASSWORD: 'Dhvl@123',
       MOBILE: '1234567890',
-      DOB: '1-12-2005',
+      DOB: '09/12/2005',
       AGE: '20',
       CITY: 'Rajkot',
       GENDER: 'male',
@@ -35,6 +18,23 @@ class UserModel {
         ['Cooking 🧑‍🍳', false],
       ],
       ISFAVORITE: true,
+    },
+    {
+      NAME: 'Prof Mehul Bhundiya',
+      EMAIL: 'mehul@du.ac.in',
+      PASSWORD: 'Mehul@123',
+      MOBILE: '9428231065',
+      DOB: '01/12/2000',
+      AGE: '25',
+      CITY: 'Rajkot',
+      GENDER: 'male',
+      HOBBIES: [
+        ['Reading 📖', true],
+        ['Traveling 🚞', true],
+        ['Dancing 🕺', true],
+        ['Cooking 🧑‍🍳', true],
+      ],
+      ISFAVORITE: false,
     },
   ];
 

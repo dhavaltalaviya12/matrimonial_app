@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../utils/string_const.dart';
 import '../utils/user_model.dart';
 import 'package:intl/intl.dart';
 
-
 class AddEditUserScreen extends StatefulWidget {
-  // Map<String, dynamic>? user;
   int? id;
   AddEditUserScreen({super.key, this.id});
 
@@ -17,15 +16,8 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
   GlobalKey<FormState> formKey = GlobalKey();
 
   List<String> citiesList = [
-    'Rajkot',
-    'Surat',
-    'Ahmedabad',
-    'Vadodara',
-    'Gandhinagar',
-    'Jamnagar',
+    'Rajkot', 'Surat', 'Ahmedabad', 'Vadodara', 'Gandhinagar', 'Jamnagar',
   ];
-  String dob = '';
-  DateTime? date = DateTime.now();
 
   bool favoriteController = false;
   TextEditingController fullNameController = TextEditingController();
@@ -34,7 +26,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
   TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController mobileController = TextEditingController();
   TextEditingController dateController = TextEditingController();
-  String cityController = '🗺️ City';
+  String? _selectCity = 'Select City';
   int age = 18;
   String genderController = 'male';
   List<List> hobbiesController = [
@@ -44,29 +36,21 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
     ['Cooking 🧑‍🍳', false],
   ];
   bool isHide = true;
-
+  bool isHid = true;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     if (widget.id != null) {
       Map<String, dynamic> user = UserModel.userList[widget.id!];
-      print(user);
       favoriteController = user[ISFAVORITE];
       fullNameController.text = user[NAME];
       emailController.text = user[EMAIL];
       passwordController.text = user[PASSWORD];
       confirmPasswordController.text = user[PASSWORD];
       mobileController.text = user[MOBILE];
-      List<String> parts = user[DOB].split('-');
-      int day = int.parse(parts[0]);
-      int month = int.parse(parts[1]);
-      int year = int.parse(parts[2]);
-      date = DateTime(year, month, day);
-      dob = '${date!.day}-${date!.month}-${date!.year}';
-      dateController.text = dob;
-      cityController = user[CITY];
+      dateController.text = user[DOB];
+      _selectCity = user[CITY];
       genderController = user[GENDER];
       hobbiesController = user[HOBBIES];
     }
@@ -76,217 +60,175 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
 
   @override
   Widget build(BuildContext context) {
-    setState(() {});
     return Scaffold(
-      // appBar: Components.getAppBar(
-      //   icon: Icons.person_add,
-      //   title: 'Add User',
-      // ),
-        appBar: AppBar(
-          title: Row(
-            children: [
-              Icon(
-                widget.id!=null ? Icons.edit : Icons.person,
-                size: 25,
-                weight: 400,
-                color: Colors.white,
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              Expanded(
-                child: Text(
-                  widget.id!=null ? 'Edit User' : 'Add User',
-                  style: const TextStyle(
-                    fontSize: 25,
-                    color: Colors.white,
-                  ),
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Icon(
+              widget.id != null ? Icons.edit : Icons.person,
+              size: 25,
+              weight: 400,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                widget.id != null ? 'Edit User' : 'Add User',
+                style: const TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.blue,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(15),
+        child: Form(
+          key: formKey,
+          child: Column(
+            children: [
+              getFormField(
+                controller: fullNameController,
+                keyboardType: TextInputType.name,
+                labelText: '😇 Full Name',
+                hintText: 'Enter Full Name',
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r"^[A-Z][a-zA-Z\s'-]{2,49}$"))
+                ],
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Enter valid name (3-50 characters, alphabets only)';
+                  }
+                  var regex = RegExp(r"^[A-Z][a-zA-Z\s'-]{2,49}$");
+                  if (!regex.hasMatch(value)) {
+                    return 'Enter a valid full name \n (3-50 characters, alphabets only, first letter is capital)';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              getFormField(
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                labelText: '📧 Email Address',
+                hintText: 'Enter your Email',
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r"^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"))
+                ],
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Enter a valid email address';
+                  }
+                  var regex = RegExp(r"^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$");
+                  if (!regex.hasMatch(value)) {
+                    return 'Enter a valid email address';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              getFormField(
+                controller: passwordController,
+                keyboardType: TextInputType.visiblePassword,
+                labelText: '🗝️ Password',
+                hintText: 'Enter your password',
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$"))
+                ],
+                obscureText: isHide,
+                suffixIcon: IconButton(
+                  icon: Icon(isHide ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      isHide = !isHide;
+                    });
+                  },
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Enter Password';
+                  }
+                  var regex = RegExp(r"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$");
+                  if (!regex.hasMatch(value)) {
+                    return 'Set strong Password :\n Minimum 8 characters\nat least contains 1\n uppercase letter,\n lowercase letter,\n digit,\n special character';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              getFormField(
+                controller: confirmPasswordController,
+                keyboardType: TextInputType.visiblePassword,
+                obscureText: isHid,
+                labelText: '🔐 Confirm Password',
+                hintText: 'Enter your password again',
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$"))
+                ],
+                suffixIcon: IconButton(
+                  icon: Icon(isHid ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      isHid = !isHid;
+                    });
+                  },
+                ),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Enter confirm password';
+                  }
+                  if (value != passwordController.text) {
+                    return 'Passwords do not match';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              getPhoneField(),
+              const SizedBox(height: 20),
+              _datePicker(),
+              const SizedBox(height: 20),
+              _dropdownField(
+                options: [
+                  'Rajkot',
+                  'Surat',
+                  'Ahmedabad',
+                  'Vadodara',
+                  'Jamnagar',
+                  'Junagadh'
+                ],
+                onChanged: (value) => setState(() => _selectCity = value),
+              ),
+              const SizedBox(height: 20),
+              getGenderField(),
+              const SizedBox(height: 20),
+              getHobbiesField(),
+              const SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: saveForm,
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                    child: const Text('Save', style: TextStyle(color: Colors.white, fontSize: 20)),
+                  ),
+                  const SizedBox(width: 20),
+                  ElevatedButton(
+                    onPressed: resetForm,
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+                    child: const Text('Reset', style: TextStyle(color: Colors.white, fontSize: 20)),
+                  ),
+                ],
               ),
             ],
           ),
-          backgroundColor: Colors.blue,
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(15),
-          child: Form(
-              key: formKey,
-              child: Column(
-                children: [
-                  getFormField(
-                    controller: fullNameController,
-                    keyboardType: TextInputType.name,
-                    labelText: '😇 Full Name',
-                    hintText: 'Enter Full Name ',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Enter valid name (3-50 characters, alphabets only)';
-                      }
-                      var regex = RegExp(r"^[a-zA-Z\s'-]{3,50}$");
-
-                      if (!regex.hasMatch(value)) {
-                        return 'Enter a valid full name \n (3-50 characters, alphabets only)';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  getFormField(
-                    controller: emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    labelText: '📧 Email Address',
-                    hintText: 'Enter your Email',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Enter a valid email address';
-                      }
-                      var regex =
-                      RegExp(r"^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$");
-                      if (!regex.hasMatch(value)) {
-                        return 'Enter a valid email address';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  getFormField(
-                    controller: passwordController,
-                    keyboardType: TextInputType.visiblePassword,
-                    labelText: '🗝️ Password',
-                    hintText: 'Enter your password',
-                    obscureText: isHide,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                          isHide ? Icons.visibility : Icons.visibility_off),
-                      onPressed: () {
-                        setState(() {
-                          isHide = !isHide;
-                        });
-                      },
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Enter Password';
-                      }
-                      var regex = RegExp(
-                          r"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$");
-                      if (!regex.hasMatch(value)) {
-                        return 'Set strong Password :\n Minimum 8 characters\nat least contains 1\n uppercase letter,\n lowercase letter,\n digit,\n special character';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  getFormField(
-                    controller: confirmPasswordController,
-                    keyboardType: TextInputType.visiblePassword,
-                    obscureText: isHide,
-                    labelText: '🔐 Confirm Password',
-                    hintText: 'Enter your password again',
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                          isHide ? Icons.visibility : Icons.visibility_off),
-                      onPressed: () {
-                        setState(() {
-                          isHide = !isHide;
-                        });
-                      },
-                    ),
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Enter confirm password';
-                      }
-                      if (value != passwordController.text) {
-                        return 'Passwords do not match';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  getFormField(
-                    controller: mobileController,
-                    keyboardType: TextInputType.number,
-                    labelText: '📱 Mobile number',
-                    hintText: 'Enter your mobile number',
-                    maxLength: 10,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Enter mobile number';
-                      }
-                      var regex = RegExp(r"^[0-9]{10}$");
-                      if (!regex.hasMatch(value)) {
-                        return 'Enter a valid 10-digit mobile number.';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  getDateField(),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  getCityField(),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  getGenderField(),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  getHobbiesField(),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        onPressed: saveForm,
-                        style: const ButtonStyle(
-                          backgroundColor:
-                          WidgetStatePropertyAll(Colors.green),
-                        ),
-                        child: const Text(
-                          'Save',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20),
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      ElevatedButton(
-                        onPressed: resetForm,
-                        style: const ButtonStyle(
-                          backgroundColor:
-                          WidgetStatePropertyAll(Colors.redAccent),
-                        ),
-                        child: const Text(
-                          'Reset',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20),
-                        ),
-                      ),
-                    ],
-                  )
-                ],
-              )),
-        ));
+      ),
+    );
   }
 
   void saveForm() {
@@ -299,9 +241,9 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
           email: emailController.text,
           password: passwordController.text,
           mobile: mobileController.text,
-          dob: dob,
+          dob: dateController.text,
           age: age.toString(),
-          city: cityController,
+          city: _selectCity!,
           gender: genderController,
           hobbies: hobbiesController,
           isFavorite: favoriteController,
@@ -312,9 +254,9 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
           email: emailController.text,
           password: passwordController.text,
           mobile: mobileController.text,
-          dob: dob,
+          dob: dateController.text,
           age: '18',
-          city: cityController,
+          city: _selectCity!,
           gender: genderController,
           hobbies: hobbiesController,
           isFavorite: favoriteController,
@@ -333,10 +275,10 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
     passwordController.clear();
     confirmPasswordController.clear();
     mobileController.clear();
-    dob = 'Select Date of birth';
+    dateController.clear();
     dateController.text = '';
-    cityController = '';
     genderController = 'male';
+    _selectCity = '';
     for (var hobby in hobbiesController) {
       hobby[1] = false;
     }
@@ -350,7 +292,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
     required hintText,
     obscureText = false,
     suffixIcon,
-    maxLength,
+    maxLength, required List<FilteringTextInputFormatter> inputFormatters,
   }) {
     return TextFormField(
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -370,98 +312,90 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
     );
   }
 
-  Widget getDateField() {
+  Widget getPhoneField() {
     return TextFormField(
-      mouseCursor: MouseCursor.defer,
-      keyboardType: TextInputType.datetime,
-      showCursor: true,
-      controller: dateController,
-
-      onTap: () async {
-        DateTime today = DateTime.now();
-        DateTime firstDate = DateTime(today.year - 80, today.month, today.day);
-        DateTime lastDate = DateTime(today.year - 18, today.month, today.day);
-
-        DateTime? pickedDate = await showDatePicker(
-          context: context,
-          firstDate: firstDate,
-          lastDate: lastDate,
-          initialDate: dateController.text.isEmpty?lastDate:DateFormat('dd/MM/yyyy').parse(dateController.text),
-        );
-        if (pickedDate != null) {
-          setState(() {
-            dateController.text = DateFormat('dd/MM/yyyy').format(pickedDate);
-          });
-        }
-      },
+      controller: mobileController,
+      keyboardType: TextInputType.phone,
       validator: (value) {
-        if (value == null ||
-            value.isEmpty ||
-            value == '🗓️ Select Date of birth') {
-          return 'Select your date of birth';
+        if (value == null || value.isEmpty) {
+          return 'Please enter a phone number';
         }
-        if (value.length < 8) {
-          return 'Maybe date format not supported';
-        }
-        List<String> parts = dateController.text.split('-');
-        int day = int.parse(parts[0]);
-        int month = int.parse(parts[1]);
-        int year = int.parse(parts[2]);
-        date = DateTime(year, month, day);
-        age = DateTime.now().year - date!.year;
-        if (DateTime.now().month < date!.month ||
-            (DateTime.now().month == date!.month &&
-                DateTime.now().day < date!.day)) {
-          age--;
-        }
-        if (age < 18) {
-          print('age:$age, date: $date');
-          return 'You must be at least 18 years old to register.';
+        // Regex for validating 10-digit phone number
+        var regex = RegExp(r"^[0-9]{10}$");
+        if (!regex.hasMatch(value)) {
+          return 'Enter a valid 10-digit phone number';
         }
         return null;
       },
       decoration: InputDecoration(
-        label: const Text('🗓️ Date of birth'),
-        hintText: 'Select your date of birth',
-        suffixIcon: const Icon(Icons.calendar_month),
+        labelText: "📱 Phone Number",
+        hintText: 'Enter your phone number',
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
         ),
+      ),
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+      ],
+    );
+  }
+
+
+  Widget _datePicker({String? Function(String?)? validator}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: TextFormField(
+        controller: dateController,
+        readOnly: true,
+        validator: validator,
+        decoration: InputDecoration(
+          labelText: "🗓️ Date of Birth",
+          hintText: "Enter Date of Birth",
+          suffixIcon: const Icon(Icons.calendar_month),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
+        onTap: () async {
+          DateTime today = DateTime.now();
+          DateTime firstDate = DateTime(today.year - 80, today.month, today.day);
+          DateTime lastDate = DateTime(today.year - 18, today.month, today.day);
+
+          DateTime? pickedDate = await showDatePicker(
+            context: context,
+            firstDate: firstDate,
+            lastDate: lastDate,
+            initialDate: dateController.text.isEmpty?lastDate:DateFormat('dd/MM/yyyy').parse(dateController.text),
+          );
+          if (pickedDate != null) {
+            setState(() {
+              dateController.text = DateFormat('dd/MM/yyyy').format(pickedDate);
+            });
+          }
+        },
       ),
     );
   }
 
-  Widget getCityField() {
-    return DropdownButtonFormField(
-      value: citiesList.contains(cityController) ? cityController : null,
-      decoration: InputDecoration(
-        labelText: cityController,
-        hintText: 'Select City',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
+
+  Widget _dropdownField({
+    required List<String> options,
+    required Function(String?)? onChanged,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: DropdownButtonFormField<String>(
+        decoration: InputDecoration(
+          labelText: _selectCity,
+          hintText: "Select City",
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
         ),
+        items: options
+            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+            .toList(),
+        onChanged: onChanged,
       ),
-      items: citiesList
-          .map(
-            (city) => DropdownMenuItem(
-          value: city,
-          child: Text(city),
-        ),
-      )
-          .toList(),
-      onChanged: (value) => setState(
-            () {
-          if (cityController == '🗺️ City') {
-            cityController = value!;
-          }
-        },
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty || value == '🗺️ City') {
-          return 'Select City';
-        }
-        return null;
-      },
     );
   }
 
@@ -581,4 +515,5 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
     }
     return false;
   }
+
 }
