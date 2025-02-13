@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:ui';
-
+import 'dart:async';
 import 'dashboard_screen.dart';
 
 class WelcomeBackScreen extends StatefulWidget {
@@ -13,11 +12,27 @@ class WelcomeBackScreen extends StatefulWidget {
 
 class _WelcomeBackScreenState extends State<WelcomeBackScreen> {
   @override
+  void initState() {
+    super.initState();
+
+    // Delay navigation safely
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Timer(const Duration(seconds: 2), () {
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const DashboardScreen()),
+          );
+        }
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    // Set status bar color and style
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -28,7 +43,7 @@ class _WelcomeBackScreenState extends State<WelcomeBackScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Top wave background
+          // Background wave
           Positioned(
             top: 0,
             left: 0,
@@ -44,22 +59,15 @@ class _WelcomeBackScreenState extends State<WelcomeBackScreen> {
 
           // Main content
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Center(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 200),
-
-                  // Logo
                   Image.asset(
                     'assets/images/img.png',
                     width: screenWidth * 0.6,
                   ),
-
-                  const SizedBox(height: 40),
-
-                  // Welcome text
+                  const SizedBox(height: 30),
                   const Text(
                     'Hello, Welcome!',
                     style: TextStyle(
@@ -69,37 +77,10 @@ class _WelcomeBackScreenState extends State<WelcomeBackScreen> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-
-                  const SizedBox(height: 40),
-
-                  // Let's Get Started Button
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) =>
-                            const DashboardScreen()), // Replace with your main screen
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      minimumSize: const Size(double.infinity, 56),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      "Let's Get Started",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
+                  const SizedBox(height: 30),
+                  const CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
                   ),
-
-                  const SizedBox(height: 16),
                 ],
               ),
             ),
@@ -110,7 +91,6 @@ class _WelcomeBackScreenState extends State<WelcomeBackScreen> {
   }
 }
 
-// Custom wave clipper for top background
 class WaveClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
@@ -133,7 +113,6 @@ class WaveClipper extends CustomClipper<Path> {
 
     path.lineTo(size.width, 0);
     path.close();
-
     return path;
   }
 

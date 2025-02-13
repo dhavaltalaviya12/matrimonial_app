@@ -6,29 +6,38 @@ class AboutUsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            const Icon(
-              Icons.menu_book,
-              size: 25,
-              weight: 400,
-              color: Colors.white,
-            ),
-            const SizedBox(width: 10),
-            const Expanded(
-              child: Text(
-                'About Us',
-                style: TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(25), // Rounded corners at the bottom
+            bottomRight: Radius.circular(25),
+          ),
+          child: AppBar(
+            title: Row(
+              children: [
+                const Icon(
+                  Icons.menu_book,
+                  size: 25,
+                  weight: 400,
                   color: Colors.white,
                 ),
-              ),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Text(
+                    'About Us',
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+            backgroundColor: Colors.blue,
+          ),
         ),
-        backgroundColor: Colors.blue,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -193,6 +202,7 @@ class AboutUsScreen extends StatelessWidget {
           ),
         ),
       ),
+      backgroundColor: Color(0xFFFFE8EF),
     );
   }
 

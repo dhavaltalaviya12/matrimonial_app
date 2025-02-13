@@ -16,29 +16,38 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
   Widget build(BuildContext context) {
     Map<String, dynamic> user = UserModel.getUser(id: widget.id);
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            const Icon(
-              Icons.person,
-              size: 25,
-              color: Colors.white,
-            ),
-            const SizedBox(width: 10),
-            const Expanded(
-              child: Text(
-                'User Details',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(25), // Rounded corners at the bottom
+            bottomRight: Radius.circular(25),
+          ),
+          child: AppBar(
+            title: Row(
+              children: [
+                const Icon(
+                  Icons.person,
+                  size: 25,
                   color: Colors.white,
                 ),
-              ),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Text(
+                    'User Details',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+            backgroundColor: Colors.blue,
+            elevation: 0,
+          ),
         ),
-        backgroundColor: Colors.blue,
-        elevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -48,6 +57,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Card(
+                color: Colors.white,
                 elevation: 5,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
@@ -58,11 +68,11 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                     children: [
                       CircleAvatar(
                         radius: 60,
-                        backgroundColor: user[GENDER] == 'male'
+                        backgroundColor: user[GENDER] == 'Male'
                             ? Colors.blueAccent
                             : Colors.pinkAccent,
                         child: Icon(
-                          user[GENDER] == 'male' ? Icons.male : Icons.female,
+                          user[GENDER] == 'Male' ? Icons.male : Icons.female,
                           size: 60,
                           color: Colors.white,
                         ),
@@ -107,8 +117,10 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                       ),
                       const SizedBox(height: 12),
                       rowOfCard(
-                        icon: user[GENDER] == 'male' ? Icons.male : Icons.female,
-                        iconColor: user[GENDER] == 'male' ? Colors.blue : Colors.pink,
+                        icon:
+                            user[GENDER] == 'Male' ? Icons.male : Icons.female,
+                        iconColor:
+                            user[GENDER] == 'Male' ? Colors.blue : Colors.pink,
                         field: GENDER,
                         data: user[GENDER],
                       ),
@@ -138,7 +150,9 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                             ),
                           ),
                           const SizedBox(width: 5),
-                          getHobbies(hobbies: user[HOBBIES],),
+                          getHobbies(
+                            hobbies: user[HOBBIES],
+                          ),
                         ],
                       ),
                     ],
@@ -152,13 +166,15 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
-                      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 25, vertical: 12),
                     ),
                     onPressed: () async {
                       await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AddEditUserScreen(id: widget.id),
+                          builder: (context) =>
+                              AddEditUserScreen(id: widget.id),
                         ),
                       );
                       setState(() {});
@@ -172,7 +188,8 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
-                      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 25, vertical: 12),
                     ),
                     onPressed: () {
                       showDeleteConfirmationDialog(context, widget.id);
@@ -189,6 +206,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
           ),
         ),
       ),
+      backgroundColor: Color(0xFFFFE8EF),
     );
   }
 

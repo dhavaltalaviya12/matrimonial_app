@@ -26,11 +26,11 @@ class _UserListScreenState extends State<UserListScreen> {
     setState(() {
       filteredUsers = UserModel.userList
           .where((user) =>
-      user[NAME].toLowerCase().contains(query.toLowerCase()) ||
-          user[CITY].toLowerCase().contains(query.toLowerCase()) ||
-          user[EMAIL].toLowerCase().contains(query.toLowerCase()) ||
-          user[MOBILE].contains(query) ||
-          user[AGE].contains(query))
+              user[NAME].toLowerCase().contains(query.toLowerCase()) ||
+              user[CITY].toLowerCase().contains(query.toLowerCase()) ||
+              user[EMAIL].toLowerCase().contains(query.toLowerCase()) ||
+              user[MOBILE].contains(query) ||
+              user[AGE].contains(query))
           .toList();
     });
   }
@@ -52,7 +52,8 @@ class _UserListScreenState extends State<UserListScreen> {
           filteredUsers.sort((a, b) => a[MOBILE].compareTo(b[MOBILE]));
           break;
         case 'Age':
-          filteredUsers.sort((a, b) => int.parse(a[AGE]).compareTo(int.parse(b[AGE])));
+          filteredUsers
+              .sort((a, b) => int.parse(a[AGE]).compareTo(int.parse(b[AGE])));
           break;
       }
     });
@@ -61,43 +62,52 @@ class _UserListScreenState extends State<UserListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            const Icon(
-              Icons.list_alt,
-              size: 30,
-              color: Colors.white,
-            ),
-            const SizedBox(width: 10),
-            const Expanded(
-              child: Text(
-                'User List',
-                style: TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(25), // Rounded corners at the bottom
+            bottomRight: Radius.circular(25),
+          ),
+          child: AppBar(
+            title: Row(
+              children: [
+                const Icon(
+                  Icons.list_alt,
+                  size: 30,
                   color: Colors.white,
                 ),
-              ),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Text(
+                    'User List',
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.sort, color: Colors.white),
+                  onSelected: (String value) {
+                    _sortUsers(value); // Sort users based on selected option
+                  },
+                  itemBuilder: (BuildContext context) {
+                    return ['Name', 'Email', 'City', 'Phone', 'Age']
+                        .map((String option) {
+                      return PopupMenuItem<String>(
+                        value: option,
+                        child: Text(option),
+                      );
+                    }).toList();
+                  },
+                ),
+              ],
             ),
-            PopupMenuButton<String>(
-              icon: const Icon(Icons.sort, color: Colors.white),
-              onSelected: (String value) {
-                _sortUsers(value); // Sort users based on selected option
-              },
-              itemBuilder: (BuildContext context) {
-                return ['Name', 'Email', 'City', 'Phone', 'Age']
-                    .map((String option) {
-                  return PopupMenuItem<String>(
-                    value: option,
-                    child: Text(option),
-                  );
-                }).toList();
-              },
-            ),
-          ],
+            backgroundColor: Colors.blueAccent, // Updated color
+          ),
         ),
-        backgroundColor: Colors.blueAccent, // Updated color
       ),
       body: Column(
         children: [
@@ -107,14 +117,13 @@ class _UserListScreenState extends State<UserListScreen> {
             child: TextField(
               controller: searchController,
               decoration: InputDecoration(
+                fillColor: Colors.white,
                 hintText: 'Search by name, city, age, email, phone...',
                 prefixIcon: const Icon(Icons.search, color: Colors.redAccent),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
                   borderSide: BorderSide(color: Colors.redAccent),
-                ),
-                filled: true,
-                fillColor: Colors.grey[200], // Added fill color for search bar
+                ), // Added fill color for search bar
               ),
               onChanged: _filterUsers,
             ),
@@ -124,10 +133,20 @@ class _UserListScreenState extends State<UserListScreen> {
           ),
         ],
       ),
+      backgroundColor: Color(0xFFFFE8EF),
     );
   }
 
   Widget getUserListView() {
+    if (filteredUsers.isEmpty) {
+      return const Center(
+        child: Text(
+          "No users found",
+          style: TextStyle(
+              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
+        ),
+      );
+    }
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       itemCount: filteredUsers.length,
@@ -158,6 +177,7 @@ class _UserListScreenState extends State<UserListScreen> {
         borderRadius: BorderRadius.circular(12.0),
       ),
       elevation: 5,
+      color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(15),
         child: Row(
@@ -196,8 +216,9 @@ class _UserListScreenState extends State<UserListScreen> {
                   ),
                   const SizedBox(height: 10),
                   rowOfCard(
-                    icon: user[GENDER] == 'male' ? Icons.male : Icons.female,
-                    iconColor: user[GENDER] == 'male' ? Colors.blue : Colors.pink,
+                    icon: user[GENDER] == 'Male' ? Icons.male : Icons.female,
+                    iconColor:
+                        user[GENDER] == 'Male' ? Colors.blue : Colors.pink,
                     field: GENDER,
                     data: user[GENDER],
                   ),

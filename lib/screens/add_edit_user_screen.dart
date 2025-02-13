@@ -16,7 +16,12 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
   GlobalKey<FormState> formKey = GlobalKey();
 
   List<String> citiesList = [
-    'Rajkot', 'Surat', 'Ahmedabad', 'Vadodara', 'Gandhinagar', 'Jamnagar',
+    'Rajkot',
+    'Surat',
+    'Ahmedabad',
+    'Vadodara',
+    'Gandhinagar',
+    'Jamnagar',
   ];
 
   bool favoriteController = false;
@@ -28,12 +33,12 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
   TextEditingController dateController = TextEditingController();
   String? _selectCity = 'Select City';
   int age = 18;
-  String genderController = 'male';
+  String genderController = 'Male';
   List<List> hobbiesController = [
-    ['Reading 📖', false],
-    ['Traveling 🚞', false],
-    ['Dancing 🕺', false],
-    ['Cooking 🧑‍🍳', false],
+    ['Reading', false],
+    ['Traveling', false],
+    ['Dancing', false],
+    ['Cooking', false],
   ];
   bool isHide = true;
   bool isHid = true;
@@ -50,9 +55,15 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
       confirmPasswordController.text = user[PASSWORD];
       mobileController.text = user[MOBILE];
       dateController.text = user[DOB];
-      _selectCity = user[CITY];
+      if (citiesList.contains(user[CITY])) {
+        _selectCity = user[CITY];
+      } else {
+        _selectCity = null;
+      }
       genderController = user[GENDER];
       hobbiesController = user[HOBBIES];
+    } else {
+      _selectCity = null;
     }
   }
 
@@ -61,179 +72,244 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Icon(
-              widget.id != null ? Icons.edit : Icons.person,
-              size: 25,
-              weight: 400,
-              color: Colors.white,
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                widget.id != null ? 'Edit User' : 'Add User',
-                style: const TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60), // Custom height
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(25), // Rounded corners at the bottom
+            bottomRight: Radius.circular(25),
+          ),
+          child: AppBar(
+            title: Row(
+              children: [
+                Icon(
+                  widget.id != null ? Icons.edit : Icons.person,
+                  size: 25,
                   color: Colors.white,
                 ),
-              ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    widget.id != null ? 'Edit User' : 'Add User',
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        backgroundColor: Colors.blue,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(15),
-        child: Form(
-          key: formKey,
-          child: Column(
-            children: [
-              getFormField(
-                controller: fullNameController,
-                keyboardType: TextInputType.name,
-                labelText: '😇 Full Name',
-                hintText: 'Enter Full Name',
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r"^[A-Z][a-zA-Z\s'-]{2,49}$"))
-                ],
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Enter valid name (3-50 characters, alphabets only)';
-                  }
-                  var regex = RegExp(r"^[A-Z][a-zA-Z\s'-]{2,49}$");
-                  if (!regex.hasMatch(value)) {
-                    return 'Enter a valid full name \n (3-50 characters, alphabets only, first letter is capital)';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              getFormField(
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                labelText: '📧 Email Address',
-                hintText: 'Enter your Email',
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r"^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"))
-                ],
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Enter a valid email address';
-                  }
-                  var regex = RegExp(r"^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$");
-                  if (!regex.hasMatch(value)) {
-                    return 'Enter a valid email address';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              getFormField(
-                controller: passwordController,
-                keyboardType: TextInputType.visiblePassword,
-                labelText: '🗝️ Password',
-                hintText: 'Enter your password',
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$"))
-                ],
-                obscureText: isHide,
-                suffixIcon: IconButton(
-                  icon: Icon(isHide ? Icons.visibility : Icons.visibility_off),
-                  onPressed: () {
-                    setState(() {
-                      isHide = !isHide;
-                    });
-                  },
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Enter Password';
-                  }
-                  var regex = RegExp(r"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$");
-                  if (!regex.hasMatch(value)) {
-                    return 'Set strong Password :\n Minimum 8 characters\nat least contains 1\n uppercase letter,\n lowercase letter,\n digit,\n special character';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              getFormField(
-                controller: confirmPasswordController,
-                keyboardType: TextInputType.visiblePassword,
-                obscureText: isHid,
-                labelText: '🔐 Confirm Password',
-                hintText: 'Enter your password again',
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$"))
-                ],
-                suffixIcon: IconButton(
-                  icon: Icon(isHid ? Icons.visibility : Icons.visibility_off),
-                  onPressed: () {
-                    setState(() {
-                      isHid = !isHid;
-                    });
-                  },
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Enter confirm password';
-                  }
-                  if (value != passwordController.text) {
-                    return 'Passwords do not match';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              getPhoneField(),
-              const SizedBox(height: 20),
-              _datePicker(),
-              const SizedBox(height: 20),
-              _dropdownField(
-                options: [
-                  'Rajkot',
-                  'Surat',
-                  'Ahmedabad',
-                  'Vadodara',
-                  'Jamnagar',
-                  'Junagadh'
-                ],
-                onChanged: (value) => setState(() => _selectCity = value),
-              ),
-              const SizedBox(height: 20),
-              getGenderField(),
-              const SizedBox(height: 20),
-              getHobbiesField(),
-              const SizedBox(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: saveForm,
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                    child: const Text('Save', style: TextStyle(color: Colors.white, fontSize: 20)),
-                  ),
-                  const SizedBox(width: 20),
-                  ElevatedButton(
-                    onPressed: resetForm,
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-                    child: const Text('Reset', style: TextStyle(color: Colors.white, fontSize: 20)),
-                  ),
-                ],
-              ),
-            ],
+            backgroundColor: Colors.blue,
+            elevation: 5, // Adds a subtle shadow effect
+            shadowColor: Colors.black38,
           ),
         ),
       ),
+      body: Container(
+        margin: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(32),
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.only(top: 20,left: 5,right: 5,bottom: 5),
+          child: Form(
+            key: formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: fullNameController,
+                  textCapitalization: TextCapitalization.words,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  decoration: InputDecoration(
+                    labelText: '😇 Full Name',
+                    hintText: 'Enter Full Name',
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                  ),
+                  onChanged: (value) {
+                    if (value.isNotEmpty) {
+                      String capitalizedValue =
+                          value[0].toUpperCase() + value.substring(1);
+                      if (capitalizedValue != value) {
+                        fullNameController.value = TextEditingValue(
+                          text: capitalizedValue,
+                          selection: TextSelection.collapsed(
+                              offset: capitalizedValue.length),
+                        );
+                      }
+                    }
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Enter valid name (3-50 characters, alphabets only)';
+                    }
+                    var regex = RegExp(r"^[A-Z][a-zA-Z\s'-]{2,49}$");
+                    if (!regex.hasMatch(value)) {
+                      return 'Enter a valid full name \n (3-50 characters, alphabets only, first letter is capital)';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                getFormField(
+                  controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  labelText: '📧 Email Address',
+                  hintText: 'Enter your Email',
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                        RegExp(r"^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"))
+                  ],
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Enter a valid email address';
+                    }
+                    var regex =
+                        RegExp(r"^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$");
+                    if (!regex.hasMatch(value)) {
+                      return 'Enter a valid email address';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                getFormField(
+                  controller: passwordController,
+                  keyboardType: TextInputType.visiblePassword,
+                  labelText: '🗝️ Password',
+                  hintText: 'Enter your password',
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(
+                        r"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$"))
+                  ],
+                  obscureText: isHide,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                        isHide ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () {
+                      setState(() {
+                        isHide = !isHide;
+                      });
+                    },
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Enter Password';
+                    }
+                    var regex = RegExp(
+                        r"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$");
+                    if (!regex.hasMatch(value)) {
+                      return 'Set strong Password :\n Minimum 8 characters\nat least contains 1\n uppercase letter,\n lowercase letter,\n digit,\n special character';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                getFormField(
+                  controller: confirmPasswordController,
+                  keyboardType: TextInputType.visiblePassword,
+                  obscureText: isHid,
+                  labelText: '🔐 Confirm Password',
+                  hintText: 'Enter your password again',
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(
+                        r"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$"))
+                  ],
+                  suffixIcon: IconButton(
+                    icon:
+                        Icon(isHid ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () {
+                      setState(() {
+                        isHid = !isHid;
+                      });
+                    },
+                  ),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Enter confirm password';
+                    }
+                    if (value != passwordController.text) {
+                      return 'Passwords do not match';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                getPhoneField(),
+                const SizedBox(height: 20),
+                getdatePicker(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please select your date of birth';
+                    }
+                    DateTime dob = DateFormat('dd/MM/yyyy').parse(value);
+                    DateTime today = DateTime.now();
+                    int age = today.year - dob.year;
+                    if (dob.add(Duration(days: age * 365)).isAfter(today)) {
+                      age--;
+                    }
+                    if (age < 18) {
+                      return 'You must be at least 18 years old to register';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                getdropdownField(
+                  options: [
+                    'Rajkot',
+                    'Surat',
+                    'Ahmedabad',
+                    'Vadodara',
+                    'Jamnagar',
+                    'Junagadh'
+                  ],
+                  onChanged: (value) => setState(() => _selectCity = value),
+                ),
+                const SizedBox(height: 20),
+                getGenderField(),
+                const SizedBox(height: 20),
+                getHobbiesField(),
+                const SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: saveForm,
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green),
+                      child: const Text('Save',
+                          style:
+                              TextStyle(color: Colors.white, fontSize: 20)),
+                    ),
+                    const SizedBox(width: 20),
+                    ElevatedButton(
+                      onPressed: resetForm,
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent),
+                      child: const Text('Reset',
+                          style:
+                              TextStyle(color: Colors.white, fontSize: 20)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      backgroundColor:  Color(0xFFFFE8EF),
     );
   }
 
   void saveForm() {
     if (formKey.currentState!.validate()) {
-      print('Form Saved');
+      DateTime dob = DateFormat('dd/MM/yyyy').parse(dateController.text);
+      age = calculateAge(dob); // Recalculate age before saving
+
       if (widget.id != null) {
         UserModel.updateUser(
           id: widget.id!,
@@ -242,7 +318,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
           password: passwordController.text,
           mobile: mobileController.text,
           dob: dateController.text,
-          age: age.toString(),
+          age: age.toString(), // Use calculated age
           city: _selectCity!,
           gender: genderController,
           hobbies: hobbiesController,
@@ -255,7 +331,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
           password: passwordController.text,
           mobile: mobileController.text,
           dob: dateController.text,
-          age: '18',
+          age: age.toString(), // Use calculated age
           city: _selectCity!,
           gender: genderController,
           hobbies: hobbiesController,
@@ -263,7 +339,6 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
         );
       }
       resetForm();
-      // Navigator.of(context).pop();
       Navigator.pop(context);
     }
   }
@@ -277,7 +352,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
     mobileController.clear();
     dateController.clear();
     dateController.text = '';
-    genderController = 'male';
+    genderController = 'Male';
     _selectCity = '';
     for (var hobby in hobbiesController) {
       hobby[1] = false;
@@ -292,7 +367,8 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
     required hintText,
     obscureText = false,
     suffixIcon,
-    maxLength, required List<FilteringTextInputFormatter> inputFormatters,
+    maxLength,
+    required List<FilteringTextInputFormatter> inputFormatters,
   }) {
     return TextFormField(
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -341,8 +417,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
     );
   }
 
-
-  Widget _datePicker({String? Function(String?)? validator}) {
+  Widget getdatePicker({String? Function(String?)? validator}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: TextFormField(
@@ -352,25 +427,28 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
         decoration: InputDecoration(
           labelText: "🗓️ Date of Birth",
           hintText: "Enter Date of Birth",
-          suffixIcon: const Icon(Icons.calendar_month),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
+          suffixIcon: Icon(Icons.calendar_month),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
         ),
         onTap: () async {
           DateTime today = DateTime.now();
-          DateTime firstDate = DateTime(today.year - 80, today.month, today.day);
+          DateTime firstDate =
+              DateTime(today.year - 80, today.month, today.day);
           DateTime lastDate = DateTime(today.year - 18, today.month, today.day);
 
           DateTime? pickedDate = await showDatePicker(
             context: context,
             firstDate: firstDate,
             lastDate: lastDate,
-            initialDate: dateController.text.isEmpty?lastDate:DateFormat('dd/MM/yyyy').parse(dateController.text),
+            initialDate: dateController.text.isEmpty
+                ? lastDate
+                : DateFormat('dd/MM/yyyy').parse(dateController.text),
           );
+
           if (pickedDate != null) {
             setState(() {
               dateController.text = DateFormat('dd/MM/yyyy').format(pickedDate);
+              age = calculateAge(pickedDate);
             });
           }
         },
@@ -378,23 +456,37 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
     );
   }
 
+  int calculateAge(DateTime dob) {
+    DateTime today = DateTime.now();
+    int age = today.year - dob.year;
+    if (dob.month > today.month ||
+        (dob.month == today.month && dob.day > today.day)) {
+      age--; // Subtract a year if the birthday hasn't occurred yet this year
+    }
+    return age;
+  }
 
-  Widget _dropdownField({
+  Widget getdropdownField({
     required List<String> options,
     required Function(String?)? onChanged,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: DropdownButtonFormField<String>(
+        value: options.contains(_selectCity) ? _selectCity : null,
         decoration: InputDecoration(
-          labelText: _selectCity,
-          hintText: "Select City",
+          labelText: '🗺️ City',
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
         ),
         items: options
-            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+            .map((city) => DropdownMenuItem(value: city, child: Text(city)))
             .toList(),
-        onChanged: onChanged,
+        hint: Text("🗺️ Select City"),
+        onChanged: (value) {
+          setState(() {
+            _selectCity = value;
+          });
+        },
       ),
     );
   }
@@ -409,20 +501,20 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
       child: Row(
         children: [
           const SizedBox(
-            width: 10,
+            width: 2,
           ),
           const Text(
             '🤔 Gender:',
             style: TextStyle(fontSize: 16),
           ),
           const SizedBox(
-            width: 50,
+            width: 2,
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               RadioMenuButton(
-                value: 'male',
+                value: 'Male',
                 groupValue: genderController,
                 onChanged: (value) {
                   setState(() {
@@ -432,10 +524,11 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
                 child: const Text(
                   '🧔‍♂️ Male',
                   style: TextStyle(fontSize: 16),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               RadioMenuButton(
-                value: 'female',
+                value: 'Female',
                 groupValue: genderController,
                 onChanged: (value) {
                   setState(() {
@@ -445,6 +538,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
                 child: const Text(
                   '👩‍🦰 Female',
                   style: TextStyle(fontSize: 16),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -456,7 +550,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
 
   Widget getHobbiesField() {
     return Container(
-      padding: const EdgeInsets.all(2),
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.grey),
@@ -464,14 +558,14 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
       child: Row(
         children: [
           const SizedBox(
-            width: 10,
+            width: 2,
           ),
           const Text(
             '😈 Hobbies:',
             style: TextStyle(fontSize: 16),
           ),
           const SizedBox(
-            width: 45,
+            width: 1,
           ),
           getHobbiesList(),
         ],
@@ -502,6 +596,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
       child: Text(
         hobbiesController[i][0],
         style: const TextStyle(fontSize: 16),
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }
@@ -515,5 +610,4 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
     }
     return false;
   }
-
 }

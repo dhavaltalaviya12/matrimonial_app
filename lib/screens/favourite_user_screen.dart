@@ -12,68 +12,99 @@ class FavouriteUserScreen extends StatefulWidget {
 }
 
 class _FavoriteUserScreenState extends State<FavouriteUserScreen> {
+  late List favoriteUsers;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateFavoriteUsers();
+  }
+
+  void _updateFavoriteUsers() {
+    setState(() {
+      favoriteUsers =
+          UserModel.userList.where((user) => user[ISFAVORITE] == true).toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            const Icon(
-              Icons.favorite,
-              size: 25,
-              color: Colors.pink,
-            ),
-            const SizedBox(width: 10),
-            const Expanded(
-              child: Text(
-                'Favourite Users',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(25),
+            bottomRight: Radius.circular(25),
+          ),
+          child: AppBar(
+            title: Row(
+              children: [
+                const Icon(Icons.favorite, size: 25, color: Colors.pink),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Text(
+                    'Favourite Users',
+                    style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
+            backgroundColor: Colors.blue,
+            elevation: 0,
+          ),
         ),
-        backgroundColor: Colors.blue,
-        elevation: 0,
       ),
       body: getFavoriteListView(),
+      backgroundColor: const Color(0xFFFFE8EF),
     );
   }
 
   Widget getFavoriteListView() {
+    if (favoriteUsers.isEmpty) {
+      return const Center(
+        child: Text(
+          "No favorite users found",
+          style: TextStyle(
+              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
+        ),
+      );
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.all(10),
-      itemCount: UserModel.userList.length,
+      itemCount: favoriteUsers.length,
       itemBuilder: (context, idx) {
-        var user = UserModel.userList[idx];
-        if (user[ISFAVORITE]) {
-          return GestureDetector(
-            onTap: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => UserDetailScreen(id: idx),
-                ),
-              );
-              setState(() {});
-            },
-            child: getCardView(user: user, idx: idx),
-          );
-        }
-        return const SizedBox.shrink(); // Returns empty widget if not a favorite user
+        if (idx >= favoriteUsers.length)
+          return const SizedBox(); // Prevent index error
+
+        var user = favoriteUsers[idx];
+
+        return GestureDetector(
+          onTap: () async {
+            int originalIndex = UserModel.userList.indexOf(user);
+            if (originalIndex == -1) return; // Prevents RangeError
+
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => UserDetailScreen(id: originalIndex)),
+            );
+            _updateFavoriteUsers();
+          },
+          child: getCardView(user),
+        );
       },
     );
   }
 
-  Widget getCardView({required user, required idx}) {
+  Widget getCardView(user) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       elevation: 5,
       child: Padding(
         padding: const EdgeInsets.all(15),
@@ -85,46 +116,37 @@ class _FavoriteUserScreenState extends State<FavouriteUserScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   rowOfCard(
-                    icon: Icons.person,
-                    iconColor: Colors.blue,
-                    field: NAME,
-                    data: user[NAME],
-                  ),
-                  const SizedBox(height: 10),
+                      icon: Icons.person,
+                      iconColor: Colors.blue,
+                      field: NAME,
+                      data: user[NAME]),
                   rowOfCard(
-                    icon: Icons.location_city,
-                    iconColor: Colors.orangeAccent,
-                    field: CITY,
-                    data: user[CITY],
-                  ),
-                  const SizedBox(height: 10),
+                      icon: Icons.location_city,
+                      iconColor: Colors.orangeAccent,
+                      field: CITY,
+                      data: user[CITY]),
                   rowOfCard(
-                    icon: Icons.mail,
-                    iconColor: Colors.green,
-                    field: EMAIL,
-                    data: user[EMAIL],
-                  ),
-                  const SizedBox(height: 10),
+                      icon: Icons.mail,
+                      iconColor: Colors.green,
+                      field: EMAIL,
+                      data: user[EMAIL]),
                   rowOfCard(
-                    icon: Icons.phone_android,
-                    iconColor: Colors.black,
-                    field: MOBILE,
-                    data: user[MOBILE],
-                  ),
-                  const SizedBox(height: 10),
+                      icon: Icons.phone_android,
+                      iconColor: Colors.black,
+                      field: MOBILE,
+                      data: user[MOBILE]),
                   rowOfCard(
-                    icon: user[GENDER] == 'male' ? Icons.male : Icons.female,
-                    iconColor: user[GENDER] == 'male' ? Colors.blue : Colors.pink,
+                    icon: user[GENDER] == 'Male' ? Icons.male : Icons.female,
+                    iconColor:
+                        user[GENDER] == 'Male' ? Colors.blue : Colors.pink,
                     field: GENDER,
                     data: user[GENDER],
                   ),
-                  const SizedBox(height: 10),
                   rowOfCard(
-                    icon: Icons.emoji_emotions_rounded,
-                    iconColor: Colors.green,
-                    field: AGE,
-                    data: user[AGE],
-                  ),
+                      icon: Icons.emoji_emotions_rounded,
+                      iconColor: Colors.green,
+                      field: AGE,
+                      data: user[AGE]),
                 ],
               ),
             ),
@@ -132,8 +154,10 @@ class _FavoriteUserScreenState extends State<FavouriteUserScreen> {
               children: [
                 IconButton(
                   onPressed: () {
-                    user[ISFAVORITE] = !user[ISFAVORITE];
-                    setState(() {});
+                    setState(() {
+                      user[ISFAVORITE] = !user[ISFAVORITE];
+                      _updateFavoriteUsers();
+                    });
                   },
                   icon: Icon(
                     user[ISFAVORITE] ? Icons.favorite : Icons.favorite_border,
@@ -143,32 +167,27 @@ class _FavoriteUserScreenState extends State<FavouriteUserScreen> {
                 ),
                 IconButton(
                   onPressed: () async {
+                    int originalIndex = UserModel.userList.indexOf(user);
+                    if (originalIndex == -1) return;
+
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => AddEditUserScreen(id: idx),
-                      ),
+                          builder: (context) =>
+                              AddEditUserScreen(id: originalIndex)),
                     );
-                    setState(() {});
+                    _updateFavoriteUsers();
                   },
-                  icon: const Icon(
-                    Icons.edit,
-                    color: Colors.blue,
-                    size: 30,
-                  ),
+                  icon: const Icon(Icons.edit, color: Colors.blue, size: 30),
                 ),
                 IconButton(
                   onPressed: () {
-                    showDeleteConfirmationDialog(context, idx);
+                    showDeleteConfirmationDialog(context, user);
                   },
-                  icon: const Icon(
-                    Icons.delete,
-                    color: Colors.red,
-                    size: 30,
-                  ),
+                  icon: const Icon(Icons.delete, color: Colors.red, size: 30),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -178,42 +197,32 @@ class _FavoriteUserScreenState extends State<FavouriteUserScreen> {
   Widget rowOfCard({
     required IconData icon,
     required Color iconColor,
-    required field,
-    required data,
+    required String field,
+    required String? data,
   }) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 30,
-          color: iconColor,
-        ),
+        Icon(icon, size: 30, color: iconColor),
         const SizedBox(width: 10),
         Text(
-          field + ': ',
+          '$field: ',
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
-            fontSize: 16,
-            color: Colors.black,
-            fontWeight: FontWeight.w600, // Added boldness for emphasis
-          ),
+              fontSize: 16, color: Colors.black, fontWeight: FontWeight.w600),
         ),
         const SizedBox(width: 10),
         Expanded(
           child: Text(
             data ?? 'null',
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.black,
-            ),
+            style: const TextStyle(fontSize: 16, color: Colors.black),
           ),
         ),
       ],
     );
   }
 
-  void showDeleteConfirmationDialog(BuildContext context, int idx) {
+  void showDeleteConfirmationDialog(BuildContext context, user) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -231,7 +240,10 @@ class _FavoriteUserScreenState extends State<FavouriteUserScreen> {
               child: const Text('Delete', style: TextStyle(color: Colors.red)),
               onPressed: () {
                 setState(() {
-                  UserModel.userList.removeAt(idx); // Delete user
+                  if (UserModel.userList.contains(user)) {
+                    UserModel.userList.remove(user);
+                    _updateFavoriteUsers();
+                  }
                 });
                 Navigator.of(context).pop();
               },
